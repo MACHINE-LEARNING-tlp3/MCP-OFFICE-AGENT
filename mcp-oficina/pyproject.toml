@@ -1,0 +1,9 @@
+[project]
+name = "mcp-oficina"
+version = "0.1.0"
+description = "Agente de Oficina que ayuda a programar reuniones, agregar contactos y enviar emails"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "mcp[cli]>=1.21.0",
+]
