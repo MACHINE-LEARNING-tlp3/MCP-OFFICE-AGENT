@@ -4,26 +4,30 @@ from datetime import datetime
 from enum import Enum
 
 # Modelos para el servidor MCP
+from pydantic import BaseModel
+from typing import List, Optional
+
 class Reunion(BaseModel):
-    id: str = Field(description="ID único de la reunión")
-    titulo: str = Field(description="Título de la reunión")
-    dia: str = Field(description="Fecha de la reunión (YYYY-MM-DD)")
-    hora: str = Field(description="Hora de la reunión (HH:MM)")
-    invitados: List[str] = Field(description="Lista de invitados")
-    descripcion: Optional[str] = Field(description="Descripción de la reunión")
+    id: str 
+    titulo: str
+    dia: str
+    hora: str
+    invitados: Optional[List[str]] = []
+    descripcion: Optional[str] = None
+    
 
 class Contacto(BaseModel):
-    nombre: str = Field(description="Nombre del contacto")
-    email: str = Field(description="Email del contacto")
-    telefono: Optional[str] = Field(description="Teléfono del contacto")
-    departamento: Optional[str] = Field(description="Departamento del contacto")
+    nombre: str
+    email: str
+    telefono: Optional[str] = None
+    departamento: Optional[str] = None
 
 class Email(BaseModel):
-    destinatario: str = Field(description="Email del destinatario")
-    asunto: str = Field(description="Asunto del email")
-    contenido: str = Field(description="Contenido del email")
-    fecha_envio: str = Field(description="Fecha de envío")
-
+    destinatario: str
+    asunto: str
+    contenido: str
+    fecha_envio: str
+    
 # Modelos para el servidor FastAPI
 class ChatMessage(BaseModel):
     role: str

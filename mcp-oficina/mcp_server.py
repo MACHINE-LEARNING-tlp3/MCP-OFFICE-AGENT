@@ -25,21 +25,44 @@ def agendar_reunion(
     titulo: str,
     dia: str,
     hora: str,
-    invitados: List[str],
+    invitados: Optional[List[str]] = [],
     descripcion: Optional[str] = None
 ) -> Reunion:
-    """Agenda una nueva reunión en el calendario."""
+    """
+    Agenda una nueva reunión. Si el usuario no especifica mes o año,
+    se asume el mes y año actuales.
+    
+    Prohibe agendar reuniones en el pasado y devolver el id de la reunion
+
+    Args:
+        dia: Día o fecha (puede ser solo '15' o '15/11')
+        hora: Hora de la reunión (HH:MM)
+        invitados: Lista de nombres
+    
+    """
+    try:
+        hoy = datetime.now()
+        if "/" not in dia:
+            dia_completo = f"{dia}/{hoy.month:02d}/{hoy.year}"
+        else:
+            partes = dia.split("/")
+            if len(partes) == 2:  
+                dia_completo = f"{partes[0]}/{partes[1]}/{hoy.year}"
+            else:
+                dia_completo = dia 
+    except Exception:
+        dia_completo = dia  
+
     nueva_reunion = Reunion(
         id=str(uuid.uuid4())[:8],
         titulo=titulo,
-        dia=dia,
+        dia=dia_completo,
         hora=hora,
         invitados=invitados,
-        descripcion=descripcion or "Reunión agendada"
+        descripcion=descripcion or "Reunión agendada automáticamente"
     )
     reuniones_db.append(nueva_reunion)
     return nueva_reunion
-
 
 @mcp.tool("consultar_reuniones")
 def consultar_reuniones() -> List[Reunion]:
@@ -48,17 +71,16 @@ def consultar_reuniones() -> List[Reunion]:
 
 
 @mcp.tool("reprogramar_reunion")
-def reprogramar_reunion(id_reunion: str, nuevo_dia: str, nueva_hora: str) -> Optional[Reunion]:
+def reprogramar_reunion(titulo: str, nuevo_dia: str, nueva_hora: str) -> Optional[Reunion]:
     """
     Reprograma la fecha y hora de una reunión existente.
     
     Args:
-        id_reunion: ID de la reunión a modificar
-        nuevo_dia: Nueva fecha (YYYY-MM-DD)
+        nuevo_dia: Nueva fecha (DD/MM/AAAA)
         nueva_hora: Nueva hora (HH:MM)
     """
     for reunion in reuniones_db:
-        if reunion.id == id_reunion:
+        if reunion.titulo ==titulo:
             reunion.dia = nuevo_dia
             reunion.hora = nueva_hora
             reunion.descripcion = f"Reprogramada para el {nuevo_dia} a las {nueva_hora}"
@@ -67,25 +89,30 @@ def reprogramar_reunion(id_reunion: str, nuevo_dia: str, nueva_hora: str) -> Opt
 
 
 @mcp.tool("eliminar_reunion")
-def eliminar_reunion(id_reunion: str) -> bool:
+def eliminar_reunion(titulo: str) -> bool:
     """
     Elimina una reunión existente por ID.
     
     Args:
-        id_reunion: ID de la reunión a eliminar
+        titulo: titulo de la reunión a eliminar
     
     Returns:
         True si se eliminó, False si no se encontró
     """
     global reuniones_db
     original_len = len(reuniones_db)
-    reuniones_db = [r for r in reuniones_db if r.id != id_reunion]
+    reuniones_db = [r for r in reuniones_db if r.id != titulo]
     return len(reuniones_db) < original_len
 
 
 # ==========================================================
 #                       TOOLS CONTACTOS
 # ==========================================================
+@mcp.tool("listar_contactos")
+def listar_contactos() -> List[Contacto]:
+    """Lista todos los contactos almacenados."""
+    return contactos_db
+
 
 @mcp.tool("buscar_contacto")
 def buscar_contacto(nombre: str) -> List[Contacto]:
@@ -192,7 +219,7 @@ def consultar_emails() -> List[Email]:
 # ========================Servidor mcp ==================================
 if __name__ == "__main__":
     print("Iniciando Servidor MCP - Asistente de Oficina")
-    print("Herramientas disponibles:agendar_reunion, consultar_reuniones, reprogramar_reunion, eliminar_reunion, agregar_contacto, buscar_contacto, editar_contacto, eliminar_contacto, enviar_email, consultar_emails")
+    print("Herramientas disponibles:agendar_reunion, consultar_reuniones, reprogramar_reunion, eliminar_reunion, agregar_contacto,lista_contactos, buscar_contacto, editar_contacto, eliminar_contacto, enviar_email, consultar_emails")
     print("Servidor ejecutándose en: http://localhost:8000")
     
     mcp.run(transport="sse")

@@ -13,23 +13,29 @@ from dotenv import load_dotenv
 
 load_dotenv()
 # Configuración
+# Configuración
 MCP_SERVER_URL = os.getenv("MCP_SERVER_URL")
-AGENT_PORT = os.getenv("AGENT_PORT")
+AGENT_PORT = int(os.getenv("AGENT_PORT", 8001)) 
 GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
+AGENT_HOST = os.getenv("AGENT_HOST", "127.0.0.1")
+
 
 # System Prompt para el agente de oficina
 SYSTEM_PROMPT = """
 Eres un asistente de oficina profesional y eficiente. Ayudas a los empleados con:
 
 GESTIÓN DE REUNIONES:
-- Agendar nuevas reuniones con título, fecha, hora e invitados
+- Agendar nuevas reuniones con título(opcional), fecha, hora, invitados y descripción(opcional)
+- Reprogramar reuniones existentes
+- Eliminar reuniones
 - Consultar reuniones existentes
-- Organizar el calendario
 
 GESTIÓN DE CONTACTOS:
 - Buscar contactos por nombre
 - Agregar nuevos contactos
-- Mantener la lista de contactos actualizada
+- Eliminar contactos
+- Editar información de contactos
+- Listar todos los contactos
 
 GESTIÓN DE EMAILS:
 - Enviar emails a contactos
@@ -41,6 +47,7 @@ REGLAS IMPORTANTES:
 3. Mantén un tono profesional y útil
 4. Si no tienes información suficiente, pide clarificación
 5. Usa las herramientas disponibles para realizar acciones concretas
+6. Aunque el usuario no te de en el formato que esperas, siempre intenta extraer la información necesaria para completar la tarea
 
 Responde en español de manera clara y profesional.
 """
@@ -83,6 +90,7 @@ async def lifespan(app: FastAPI):
         # Obtener herramientas
         print("Obteniendo herramientas del servidor MCP...")
         tools = await client.get_tools()
+        
         
         if not tools:
             raise Exception("No se pudieron cargar las herramientas del servidor MCP")
@@ -260,7 +268,7 @@ if __name__ == "__main__":
     
     uvicorn.run(
         app,
-        host="127.0.0.1",
+        host=AGENT_HOST,
         port=AGENT_PORT,
         log_level="info"
     )
