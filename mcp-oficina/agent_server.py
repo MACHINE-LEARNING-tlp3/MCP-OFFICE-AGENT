@@ -163,55 +163,55 @@ async def handle_chat(request: ChatRequest):
     try:
         # Configurar modelo con herramientas
         model_with_tools = model.bind_tools(tools)
-        
+
         # Ejecutar agente con máximo de iteraciones
         max_iterations = 5
         iteration = 0
-        
+
         while iteration < max_iterations:
             iteration += 1
             print(f"Iteración {iteration}")
-            
+
             # Invocar modelo
             response = await model_with_tools.ainvoke(messages)
-            
+
             # Verificar si el modelo quiere usar herramientas
             if hasattr(response, 'tool_calls') and response.tool_calls:
                 print(f"Ejecutando {len(response.tool_calls)} herramienta(s)")
-                
+
                 # Agregar respuesta del modelo al historial
                 messages.append(response)
-                
+
                 # Procesar cada herramienta
                 for tool_call in response.tool_calls:
                     tool_name = tool_call['name']
                     tool_args = tool_call['args']
                     tool_id = tool_call['id']
-                    
+
                     print(f"  → Ejecutando: {tool_name}")
                     print(f"    Argumentos: {tool_args}")
-                    
+
                     # Buscar la herramienta
                     tool_to_use = next((t for t in tools if t.name == tool_name), None)
-                    
+
                     if tool_to_use:
                         try:
                             # Ejecutar herramienta
                             tool_result = await tool_to_use.ainvoke(tool_args)
-                            
+
                             # Formatear resultado
                             if hasattr(tool_result, 'dict'):
                                 result_str = json.dumps(tool_result.dict(), ensure_ascii=False, indent=2)
                             elif isinstance(tool_result, list):
                                 result_str = json.dumps([
-                                    item.dict() if hasattr(item, 'dict') else item 
+                                    item.dict() if hasattr(item, 'dict') else item
                                     for item in tool_result
                                 ], ensure_ascii=False, indent=2)
                             else:
                                 result_str = str(tool_result)
-                            
+
                             print(f"Resultado: {result_str[:200]}...")
-                            
+
                             # Agregar resultado al historial
                             messages.append(
                                 ToolMessage(
@@ -219,7 +219,7 @@ async def handle_chat(request: ChatRequest):
                                     tool_call_id=tool_id
                                 )
                             )
-                            
+
                         except Exception as e:
                             error_msg = f"Error ejecutando {tool_name}: {str(e)}"
                             print(f"{error_msg}")
@@ -238,24 +238,30 @@ async def handle_chat(request: ChatRequest):
                                 tool_call_id=tool_id
                             )
                         )
-                
+
                 # Continuar para procesar resultados
                 continue
             else:
                 # Respuesta final sin herramientas
                 ai_response = response.content
-                
-                if not ai_response or ai_response.strip() == "":
+
+                # Si la respuesta es una lista, conviértela a string
+                if isinstance(ai_response, list):
+                    ai_response_str = "\n".join(str(item) for item in ai_response)
+                else:
+                    ai_response_str = str(ai_response)
+
+                if not ai_response_str or ai_response_str.strip() == "":
                     print("Respuesta vacía, reintentando...")
                     continue
-                
-                print(f"Respuesta final: {ai_response[:150]}...")
-                return {"response": ai_response}
-        
+
+                print(f"Respuesta final: {ai_response_str[:150]}...")
+                return {"response": ai_response_str}
+
         # Límite de iteraciones alcanzado
         print("Límite de iteraciones alcanzado")
         return {"response": "No pude completar tu solicitud. ¿Podrías intentarlo de nuevo?"}
-        
+
     except Exception as e:
         print(f"Error en el agente: {e}")
         import traceback
