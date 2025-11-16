@@ -1,1 +1,71 @@
 @import "tailwindcss";
+
+@import "tailwindcss";
+
+/* Animaciones personalizadas para el loading del chat */
+@keyframes bounce {
+  0%,
+  100% {
+    transform: translateY(-25%);
+    animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
+  }
+  50% {
+    transform: translateY(0);
+    animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
+  }
+}
+
+.animate-bounce {
+  animation: bounce 1s infinite;
+}
+
+.delay-100 {
+  animation-delay: 0.1s;
+}
+
+.delay-200 {
+  animation-delay: 0.2s;
+}
+
+/* Utilidad para limitar líneas de texto */
+.line-clamp-2 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+}
+
+/* Ocultar scroll */
+.scroll-hide {
+  scrollbar-width: none;
+}
+.scroll-hide::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}
+
+/* Mostrar scroll fino al hover */
+.scroll-wrapper:hover::-webkit-scrollbar {
+  width: 6px;
+}
+.scroll-wrapper:hover::-webkit-scrollbar-thumb {
+  background: #c4c4c4; /* color del thumb (la barrita) */
+  border-radius: 10px;
+}
+
+.scroll-thin::-webkit-scrollbar-track {
+  background: transparent; /* track invisible */
+}
+
+.scroll-thin::-webkit-scrollbar {
+  width: 6px; /* ancho de la barra */
+}
+.scroll-thin::-webkit-scrollbar-thumb {
+  background-color: rgba(100, 100, 100, 0.4); /* color de la barra */
+  border-radius: 10px;
+}
+.scroll-thin {
+  scrollbar-width: thin; /* barra fina */
+  scrollbar-color: rgba(100, 100, 100, 0.4) transparent;
+}
