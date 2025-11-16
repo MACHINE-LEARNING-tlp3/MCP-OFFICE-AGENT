@@ -8,13 +8,44 @@ from datetime import datetime
 mcp = FastMCP("Asistente de Oficina")
 
 # Datos simulados en memoria
-reuniones_db = []
-contactos_db = [
-    Contacto(nombre="Juan Pérez", email="juan@empresa.com", telefono="+123456789", departamento="TI"),
-    Contacto(nombre="María García", email="maria@empresa.com", telefono="+987654321", departamento="RRHH"),
-    Contacto(nombre="Carlos López", email="carlos@empresa.com", telefono="+112233445", departamento="Ventas")
+reuniones_db = [
+    Reunion(
+        id="eekkskkw",
+        titulo="Reunión sobre Mantenimiento",
+        dia="15/11/2023",
+        hora="10:00",
+        invitados=["Juan Pérez", "María García", "Carlos López"],
+        descripcion="Reunión para discutir el plan de mantenimiento anual."
+    ),
+    Reunion(
+        id="ksksksk",
+        titulo="Reunión sobre Nuevas funcionalidades",
+        dia="15/11/2023",
+        hora="11:00",
+        invitados=["Juan Pérez", "María García", "Carlos López"],
+        descripcion="Reunión para discutir las nuevas funcionalidades."
+    )
 ]
-emails_enviados = []
+
+contactos_db = [
+    Contacto(nombre="Juan Pérez", email="juan@gmail.com.com", telefono="+123456789", departamento="TI"),
+    Contacto(nombre="María García", email="maria@gamil.com", telefono="+987654321", departamento="RRHH"),
+    Contacto(nombre="Carlos López", email="carlos@gmail.com", telefono="+112233445", departamento="Ventas")
+]
+emails_enviados = [
+    Email(
+        destinatario="tatiana@gmail.com",
+        asunto="Mal comportamiento",
+        contenido="Por qué te negás a modularizar tu código?",
+        fecha_envio="2023-11-15 10:00:00"
+    ),
+    Email(
+        destinatario="ailin@gmail.com",
+        asunto="Ninguno",
+        contenido="demasiado lindo tu código",
+        fecha_envio="2023-11-15 10:00:00"
+    )
+]
 
 # ==========================================================
 #                       TOOLS REUNIONES

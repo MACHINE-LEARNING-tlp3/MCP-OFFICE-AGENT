@@ -10,6 +10,7 @@ from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_mcp_adapters.client import MultiServerMCPClient
 from langchain_core.messages import AIMessage, HumanMessage, SystemMessage, ToolMessage
 from dotenv import load_dotenv
+import json
 
 load_dotenv()
 # Configuración
@@ -137,6 +138,84 @@ async def health_check():
         "message": "Agente de asistencia de oficina",
         "tools_loaded": len(tools) if tools else 0
     }
+
+
+@app.get("/contactos")
+async def get_contactos():
+    tool = next((t for t in tools if t.name == "listar_contactos"), None)
+    if not tool:
+        raise HTTPException(status_code=500, detail="Tool listar_contactos no encontrada")
+
+    result = await tool.ainvoke({})
+
+    # Si el resultado es una lista: parsear cada elemento
+    if isinstance(result, list):
+        parsed = []
+        for item in result:
+            if isinstance(item, str):
+                try:
+                    parsed.append(json.loads(item))
+                except:
+                    parsed.append({"raw": item})  # si algún elemento no es JSON
+            else:
+                parsed.append(item)
+        return parsed
+
+    # Si no es lista, lo devuelve como dict si se puede
+    if hasattr(result, "dict"):
+        return result.dict()
+    return result
+
+@app.get("/reuniones")
+async def get_reuniones():
+    tool = next((t for t in tools if t.name == "consultar_reuniones"), None)
+    if not tool:
+        raise HTTPException(status_code=500, detail="Tool consultar_reuniones no encontrada")
+
+    result = await tool.ainvoke({})
+
+    if isinstance(result, list):
+        parsed = []
+        for item in result:
+            if isinstance(item, str):
+                try:
+                    parsed.append(json.loads(item))
+                except:
+                    parsed.append({"raw": item}) 
+            else:
+                parsed.append(item)
+        return parsed
+
+    if hasattr(result, "dict"):
+        return result.dict()
+    return result
+
+
+@app.get("/emails")
+async def get_emails():
+    tool = next((t for t in tools if t.name == "consultar_emails"), None)
+    if not tool:
+        raise HTTPException(status_code=500, detail="Tool consultar_emails no encontrada")
+
+    result = await tool.ainvoke({})
+
+    if isinstance(result, list):
+        parsed = []
+        for item in result:
+            if isinstance(item, str):
+                try:
+                    parsed.append(json.loads(item))
+                except:
+                    parsed.append({"raw": item})
+            else:
+                parsed.append(item)
+        return parsed
+
+    if hasattr(result, "dict"):
+        return result.dict()
+    return result
+
+
 
 @app.post("/chat")
 async def handle_chat(request: ChatRequest):
