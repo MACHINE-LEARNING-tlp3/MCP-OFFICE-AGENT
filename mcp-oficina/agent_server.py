@@ -30,6 +30,7 @@ Eres un asistente de oficina profesional y eficiente. Ayudas a los empleados con
 ## GESTIÓN DE REUNIONES:
 - **agendar_reunion**: Agenda nuevas reuniones
   - Parámetros requeridos: título, fecha, hora
+  - Si no se especifican, volver a preguntar hasta tener titulo, fecha y hora
   - Parámetros opcionales: invitados (lista), descripción
   - Formatos de fecha aceptados: 
     * Solo día: "15" (asume mes y año actual)
@@ -71,7 +72,6 @@ Eres un asistente de oficina profesional y eficiente. Ayudas a los empleados con
 - Horas deben ser en formato 24h (HH:MM)
 - Títulos de reuniones no pueden estar vacíos
 - Evita duplicados de contactos por email
-- Búsqueda de contactos es insensible a mayúsculas y acentos (ej: "Juan Peres" encuentra "Juan Pérez")
 
 ## BÚSQUEDA INTELIGENTE DE CONTACTOS
 Cuando el usuario pida buscar, editar o eliminar un contacto y el nombre no coincida exactamente:
@@ -108,9 +108,6 @@ Tú: "Perfecto. ¿Qué título le ponemos a la reunión y quiénes serán los in
 
 Usuario: "Necesito encontrar el contacto de María"
 Tú: "Voy a buscar contactos con 'María' en el nombre..."
-
-Usuario: "Busca a Juan Perez"
-Tú: "Voy a buscar contactos con 'Juan Perez' (incluso si los nombres tienen tildes)..."
 
 Usuario: "Enviar un email a Juan"
 Tú: "Claro. ¿Cuál es el asunto del email y qué contenido quieres que lleve?"
@@ -385,20 +382,45 @@ async def handle_chat(request: ChatRequest):
                 # Continuar para procesar resultados
                 continue
             else:
-                # Respuesta final sin herramientas
+                # # Respuesta final sin herramientas
+                # ai_response = response.content
+
+                # # Si la respuesta es una lista, conviértela a string
+                # if isinstance(ai_response, list):
+                #     ai_response_str = "\n".join(str(item) for item in ai_response)
+                # else:
+                #     ai_response_str = str(ai_response)
+
+                # if not ai_response_str or ai_response_str.strip() == "":
+                #     print("Respuesta vacía, reintentando...")
+                #     continue
+
+                # print(f"Respuesta final: {ai_response_str[:150]}...")
+                # return {"response": ai_response_str}
+                # Extraer SOLO el texto útil de la respuesta del LLM
                 ai_response = response.content
 
-                # Si la respuesta es una lista, conviértela a string
-                if isinstance(ai_response, list):
-                    ai_response_str = "\n".join(str(item) for item in ai_response)
+                ai_response_str = ""
+                if isinstance(ai_response, str):
+                    ai_response_str = ai_response.strip()
+                elif isinstance(ai_response, list):
+                    # En algunos casos, Gemini devuelve una lista de partes (texto + extras)
+                    for part in ai_response:
+                        if isinstance(part, dict) and part.get("type") == "text":
+                            ai_response_str = part.get("text", "").strip()
+                            break
+                        elif isinstance(part, str):
+                            ai_response_str = part.strip()
+                            break
                 else:
-                    ai_response_str = str(ai_response)
+                    ai_response_str = str(ai_response).strip()
 
-                if not ai_response_str or ai_response_str.strip() == "":
-                    print("Respuesta vacía, reintentando...")
-                    continue
+                # Si sigue vacío, usar fallback
+                if not ai_response_str:
+                    ai_response_str = "Lo siento, no pude generar una respuesta. ¿Podrías reformular tu solicitud?"
 
-                print(f"Respuesta final: {ai_response_str[:150]}...")
+                print(f"Respuesta final (texto puro): {ai_response_str[:200]}...")
+
                 return {"response": ai_response_str}
 
         # Límite de iteraciones alcanzado

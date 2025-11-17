@@ -333,6 +333,28 @@ def listar_contactos() -> List[Contacto]:
     """Lista todos los contactos almacenados ordenados alfabéticamente."""
     return sorted(contactos_db, key=lambda c: c.nombre)
 
+# @mcp.tool("buscar_contacto")
+# def buscar_contacto(nombre: str) -> List[Contacto]:
+#     """
+#     Busca contactos por nombre (búsqueda parcial case-insensitive).
+
+#     Args:
+#         nombre: Texto a buscar en los nombres
+    
+#     Returns:
+#     Lista de contactos coincidentes
+#     """
+
+#     if not nombre or not nombre.strip():
+#         return []
+
+#     busqueda = nombre.lower().strip()
+#     resultados = [
+#         c for c in contactos_db
+#         if busqueda in c.nombre.lower()
+#     ]
+
+#     return resultados
 
 def normalizar_texto(texto: str) -> str:
     """Elimina acentos/diacríticos y convierte a minúsculas para búsqueda flexible."""
@@ -347,12 +369,8 @@ def normalizar_texto(texto: str) -> str:
 def buscar_contacto(nombre: str) -> List[Contacto]:
     """
     Busca contactos por nombre (búsqueda parcial, insensible a mayúsculas y acentos).
-    Ej: 'Juan Perez' encontrará 'Juan Pérez', 'JUAN PEREZ', etc.
-    Args:
-        nombre: Texto a buscar en los nombres
     
-    Returns:
-        Lista de contactos coincidentes
+    Ej: 'Juan Perez' encontrará 'Juan Pérez', 'JUAN PEREZ', etc.
     """
     if not nombre or not nombre.strip():
         return []
