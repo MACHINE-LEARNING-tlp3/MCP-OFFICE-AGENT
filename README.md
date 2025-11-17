@@ -123,6 +123,7 @@ npm run dev
 
 ### Estructura del proyecto
 
+```bash
 MCP-OFFICE-AGENT/
 ├── frontend/                     # Frontend del agente
 │   ├── App.tsx                   # Componente principal
@@ -142,7 +143,7 @@ MCP-OFFICE-AGENT/
 └── README.md                     # Documentación del proyecto
 
 
-
+```
 ---
 
 ### Autoras del proyecto
