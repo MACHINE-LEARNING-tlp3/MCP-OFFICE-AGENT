@@ -49,7 +49,7 @@ export default function Chat({ onUpdate }: ChatProps) {
 
       const assistantMessage: Message = {
         role: "ai",
-        content: data.response,
+        content: data.response || data.text || JSON.stringify(data),
       };
 
       setMessages((prev) => [...prev, assistantMessage]);
