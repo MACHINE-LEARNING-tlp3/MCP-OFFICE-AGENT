@@ -4,6 +4,7 @@ from typing import List, Optional
 import uuid
 from datetime import datetime, date
 import re
+import unicodedata
 
 # Inicializar servidor MCP
 mcp = FastMCP("Asistente de Oficina")
@@ -326,16 +327,27 @@ def eliminar_reunion(titulo: str) -> dict:
 #                       TOOLS CONTACTOS
 # ==========================================================
 
+
 @mcp.tool("listar_contactos")
 def listar_contactos() -> List[Contacto]:
     """Lista todos los contactos almacenados ordenados alfabéticamente."""
     return sorted(contactos_db, key=lambda c: c.nombre)
 
+
+def normalizar_texto(texto: str) -> str:
+    """Elimina acentos/diacríticos y convierte a minúsculas para búsqueda flexible."""
+    # Normaliza Unicode (NFD descompone 'é' → 'e' + '´')
+    texto_normalizado = unicodedata.normalize('NFD', texto)
+    # Elimina marcas diacríticas (acentos, tildes, etc.)
+    texto_sin_acentos = ''.join(c for c in texto_normalizado if not unicodedata.combining(c))
+    # Convierte a minúsculas y elimina espacios extra
+    return texto_sin_acentos.lower().strip()
+
 @mcp.tool("buscar_contacto")
 def buscar_contacto(nombre: str) -> List[Contacto]:
     """
-    Busca contactos por nombre (búsqueda parcial case-insensitive).
-    
+    Busca contactos por nombre (búsqueda parcial, insensible a mayúsculas y acentos).
+    Ej: 'Juan Perez' encontrará 'Juan Pérez', 'JUAN PEREZ', etc.
     Args:
         nombre: Texto a buscar en los nombres
     
@@ -345,10 +357,10 @@ def buscar_contacto(nombre: str) -> List[Contacto]:
     if not nombre or not nombre.strip():
         return []
     
-    busqueda = nombre.lower().strip()
+    busqueda_normalizada = normalizar_texto(nombre)
     resultados = [
         c for c in contactos_db
-        if busqueda in c.nombre.lower()
+        if busqueda_normalizada in normalizar_texto(c.nombre)
     ]
     
     return resultados
