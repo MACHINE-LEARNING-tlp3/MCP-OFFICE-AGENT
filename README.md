@@ -125,21 +125,22 @@ npm run dev
 
 MCP-OFFICE-AGENT/
 ├── frontend/                     # Frontend del agente
-│   ├── App.tsx                   # Componente principal del frontend
+│   ├── App.tsx                   # Componente principal
 │   └── src/                      # Código fuente del frontend
-│       ├── components/
-│       │   ├── Chat.tsx
-│       │   ├── Contactos.tsx
-│       │   ├── Reuniones.tsx
-│       │   └── Emails.tsx
+│       └── components/
+│           ├── Chat.tsx
+│           ├── Contactos.tsx
+│           ├── Reuniones.tsx
+│           └── Emails.tsx
 │
 ├── mcp-oficina/                  # Backend y servidor MCP
 │   ├── mcp_server.py             # Tools MCP: reuniones, contactos y emails
-│   ├── agent_server.py           # Servidor del agente con LangChain + Gemini
+│   ├── agent_server.py           # Servidor del agente (LangChain + Gemini)
 │   ├── models.py                 # Modelos Pydantic
-│   └── requirements.txt          # Dependencias Python del backend
+│   └── requirements.txt          # Dependencias Python
 │
 └── README.md                     # Documentación del proyecto
+
 
 
 ---
@@ -148,4 +149,5 @@ MCP-OFFICE-AGENT/
 
 - **Tatiana Medina**: [GitHub](https://github.com/tatymediina)
 - **Ailín Miño**: [GitHub](https://github.com/ayelenailin-m)
+
 
