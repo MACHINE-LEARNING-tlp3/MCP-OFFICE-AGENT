@@ -160,6 +160,16 @@ def formatear_fecha(dia: str) -> str:
     
     # Si no coincide con ningún formato, devolver original para validación
     return dia
+
+def normalizar_texto(texto: str) -> str:
+    """Elimina acentos/diacríticos y convierte a minúsculas para búsqueda flexible."""
+    # Normaliza Unicode (NFD descompone 'é' → 'e' + '´')
+    texto_normalizado = unicodedata.normalize('NFD', texto)
+    # Elimina marcas diacríticas (acentos, tildes, etc.)
+    texto_sin_acentos = ''.join(c for c in texto_normalizado if not unicodedata.combining(c))
+    # Convierte a minúsculas y elimina espacios extra
+    return texto_sin_acentos.lower().strip()
+
 # ==========================================================
 #                       TOOLS REUNIONES
 # ==========================================================
@@ -225,7 +235,7 @@ def agendar_reunion(
         return {
             "success": True,
             "mensaje": f"Reunión '{titulo}' agendada exitosamente para el {dia_formateado} a las {hora}",
-            "reunion": nueva_reunion.dict(),
+            "reunion": nueva_reunion.model_dump(),
             "id": nueva_reunion.id,
             "fecha_original": dia_original,
             "fecha_formateada": dia_formateado
@@ -287,7 +297,7 @@ def reprogramar_reunion(titulo: str, nuevo_dia: str, nueva_hora: str) -> dict:
         return {
             "success": True,
             "mensaje": f"Reunión '{titulo}' reprogramada exitosamente",
-            "reunion": reunion_encontrada.dict()
+            "reunion": reunion_encontrada.model_dump()
         }
         
     except Exception as e:
@@ -320,7 +330,7 @@ def eliminar_reunion(titulo: str) -> dict:
     return {
         "success": True,
         "mensaje": f"Reunión '{titulo}' eliminada exitosamente",
-        "reunion_eliminada": reunion_encontrada.dict()
+        "reunion_eliminada": reunion_encontrada.model_dump()
     }
 
 # ==========================================================
@@ -334,25 +344,12 @@ def listar_contactos() -> List[Contacto]:
     return sorted(contactos_db, key=lambda c: c.nombre)
 
 
-def normalizar_texto(texto: str) -> str:
-    """Elimina acentos/diacríticos y convierte a minúsculas para búsqueda flexible."""
-    # Normaliza Unicode (NFD descompone 'é' → 'e' + '´')
-    texto_normalizado = unicodedata.normalize('NFD', texto)
-    # Elimina marcas diacríticas (acentos, tildes, etc.)
-    texto_sin_acentos = ''.join(c for c in texto_normalizado if not unicodedata.combining(c))
-    # Convierte a minúsculas y elimina espacios extra
-    return texto_sin_acentos.lower().strip()
-
 @mcp.tool("buscar_contacto")
 def buscar_contacto(nombre: str) -> List[Contacto]:
     """
     Busca contactos por nombre (búsqueda parcial, insensible a mayúsculas y acentos).
-    Ej: 'Juan Perez' encontrará 'Juan Pérez', 'JUAN PEREZ', etc.
-    Args:
-        nombre: Texto a buscar en los nombres
     
-    Returns:
-        Lista de contactos coincidentes
+    Ej: 'Juan Perez' encontrará 'Juan Pérez', 'JUAN PEREZ', etc.
     """
     if not nombre or not nombre.strip():
         return []
@@ -405,7 +402,7 @@ def agregar_contacto(
         return {
             "success": True,
             "mensaje": f"Contacto '{nombre}' agregado exitosamente",
-            "contacto": nuevo_contacto.dict()
+            "contacto": nuevo_contacto.model_dump()
         }
         
     except Exception as e:
@@ -476,7 +473,7 @@ def editar_contacto(
         return {
             "success": True,
             "mensaje": f"Contacto actualizado exitosamente. Campos modificados: {', '.join(cambios)}",
-            "contacto": contacto_encontrado.dict()
+            "contacto": contacto_encontrado.model_dump()
         }
         
     except Exception as e:
@@ -509,7 +506,7 @@ def eliminar_contacto(nombre: str) -> dict:
     return {
         "success": True,
         "mensaje": f"Contacto '{nombre}' eliminado exitosamente",
-        "contacto_eliminado": contacto_encontrado.dict()
+        "contacto_eliminado": contacto_encontrado.model_dump()
     }
 
 # ==========================================================
@@ -546,7 +543,7 @@ def enviar_email(destinatario: str, asunto: str, contenido: str) -> dict:
         return {
             "success": True,
             "mensaje": f"Email enviado exitosamente a {destinatario}",
-            "email": nuevo_email.dict()
+            "email": nuevo_email.model_dump()
         }
         
     except Exception as e:
@@ -568,3 +565,4 @@ if __name__ == "__main__":
     print("Servidor ejecutándose en: http://localhost:8000")
     
     mcp.run(transport="sse")
+    # sse: server-sent-events 
