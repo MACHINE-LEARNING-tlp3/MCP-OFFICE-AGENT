@@ -10,7 +10,7 @@ mcp = FastMCP("Asistente de Oficina")
 # Datos simulados en memoria
 reuniones_db = [
     Reunion(
-        id="eekkskkw",
+        id="1234",
         titulo="Reunión sobre Mantenimiento",
         dia="15/11/2023",
         hora="10:00",
@@ -18,7 +18,7 @@ reuniones_db = [
         descripcion="Reunión para discutir el plan de mantenimiento anual."
     ),
     Reunion(
-        id="ksksksk",
+        id="54321",
         titulo="Reunión sobre Nuevas funcionalidades",
         dia="15/11/2023",
         hora="11:00",
@@ -35,14 +35,14 @@ contactos_db = [
 emails_enviados = [
     Email(
         destinatario="tatiana@gmail.com",
-        asunto="Mal comportamiento",
-        contenido="Por qué te negás a modularizar tu código?",
+        asunto="Charla sobre la importancia de la seguridad en la industria",
+        contenido="La seguridad es esencial en la industria, y es importante que todos los empleados se sientan seguros en sus acciones y decisiones.",
         fecha_envio="2023-11-15 10:00:00"
     ),
     Email(
         destinatario="ailin@gmail.com",
-        asunto="Ninguno",
-        contenido="demasiado lindo tu código",
+        asunto="Reunión sobre ciberseguridad",
+        contenido="Hay que hablar sobre las vulnerabilidades recientemente descubiertas.",
         fecha_envio="2023-11-15 10:00:00"
     )
 ]
