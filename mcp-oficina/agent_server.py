@@ -10,7 +10,6 @@ from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_mcp_adapters.client import MultiServerMCPClient
 from langchain_core.messages import AIMessage, HumanMessage, SystemMessage, ToolMessage
 from dotenv import load_dotenv
-import json
 
 load_dotenv()
 # Configuración
@@ -382,22 +381,6 @@ async def handle_chat(request: ChatRequest):
                 # Continuar para procesar resultados
                 continue
             else:
-                # # Respuesta final sin herramientas
-                # ai_response = response.content
-
-                # # Si la respuesta es una lista, conviértela a string
-                # if isinstance(ai_response, list):
-                #     ai_response_str = "\n".join(str(item) for item in ai_response)
-                # else:
-                #     ai_response_str = str(ai_response)
-
-                # if not ai_response_str or ai_response_str.strip() == "":
-                #     print("Respuesta vacía, reintentando...")
-                #     continue
-
-                # print(f"Respuesta final: {ai_response_str[:150]}...")
-                # return {"response": ai_response_str}
-                # Extraer SOLO el texto útil de la respuesta del LLM
                 ai_response = response.content
 
                 ai_response_str = ""
