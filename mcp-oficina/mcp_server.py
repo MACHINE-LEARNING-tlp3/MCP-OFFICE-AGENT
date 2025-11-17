@@ -296,7 +296,7 @@ def reprogramar_reunion(titulo: str, nuevo_dia: str, nueva_hora: str) -> dict:
 @mcp.tool("eliminar_reunion")
 def eliminar_reunion(titulo: str) -> dict:
     """
-    Elimina una reunión existente por título.
+    Elimina una reunión existente por título (busqueda parcial case-insensitive).
     
     Args:
         titulo: Título de la reunión a eliminar
